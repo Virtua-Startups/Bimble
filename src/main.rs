@@ -1,4 +1,5 @@
-use bimble::check_folder;
+#![allow(unused_assignments)]
+use bimble::{check_folder, construct_newcd};
 use clearscreen::clear;
 use colored::*;
 use std::{
@@ -9,6 +10,7 @@ use std::{
 
 fn main() {
     let cmd: Vec<String> = args().collect();
+    let mut newcd = String::new();
     let mut projfol = cmd.get(1).unwrap_or_else(|| {
         eprintln!(
             "{}{}",
@@ -71,8 +73,7 @@ fn main() {
     } else {
         match fs::read_to_string(fol + "/main.bb") {
             Ok(cntn) => {
-                let newcd = construct_newcd(&cntn);
-                println!("{newcd}");
+                newcd = construct_newcd(&cntn);
             }
             Err(err) => {
                 println!(
@@ -84,31 +85,45 @@ fn main() {
             }
         }
     }
-}
 
-fn construct_newcd(content: &str) -> String {
-    let mut newcd = String::new();
-    let mut prevchr: Option<char> = None;
-
-    for c in content.chars() {
-        match c {
-            ' ' => {
-                if prevchr != Some(' ') {
-                    newcd.push(c);
-                }
+    let cpsepbynl = newcd.split("\n");
+    let mut fndclr = false;
+    let mut fns : Vec<String> = Vec::new();
+    let mut fndclrbraces = false;
+    let mut indexl = 1;
+    for curline in cpsepbynl {
+        let cds = curline.split_whitespace();
+        for cd in cds{
+            println!("{indexl} - {cd}");
+            if cd == "ON" && fndclr != true{
+                fndclr = true;
+                
             }
-            '\n' => {
-                newcd.push(c);
-                prevchr = None; // Reset prevchr after a newline
+            else if fndclr && cd != "{" && cd.contains("("){
+                fns.push(cd.to_string());
             }
-            _ => {
-                newcd.push(c);
+            else if !fndclrbraces && fndclr {
+                fndclrbraces = true;
             }
-        }
-        if c != '\n' {
-            prevchr = Some(c);
+            else if cd.is_empty(){
+                continue;
+            }
+            else if cd == "(" {
+                continue;
+            }
+            else if cd == ")"{
+                continue;
+            }
+            else if cd == "{" && fndclrbraces{
+                fndclrbraces = false;
+            }
+            else if cd == "}" && !fndclrbraces{
+                fndclrbraces = true;
+            }
+            else {
+                println!("{}{}{}{}","ERR AT LINE : ",indexl,"No keyword : ",cd);
+            }
+            indexl +=1;
         }
     }
-
-    newcd
 }
