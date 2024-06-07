@@ -14,14 +14,12 @@ fn main() {
     if cmd.len() <= 1 {
         run();
     }
-    let projfol = cmd.get(1).unwrap_or_else(|| {
-        eprintln!(
-            "{}{}",
-            "Error: ".red().bold(),
-            "No project folder provided.".bold()
-        );
-        exit(-1);
-    });
+    let cmd = cmd
+        .get(1)
+        .expect("expected a project folder to be provided")
+        .trim_matches('\'')
+        .trim_matches('\"');
+    let projfol = cmd;
 
     clear().unwrap();
     let curdir = current_dir().unwrap().to_string_lossy().to_string();
@@ -90,7 +88,7 @@ fn main() {
     let mut fns: Vec<String> = Vec::new();
     let mut fndclrbraces = false;
     let mut indexl = 1;
-
+    let mut echonl = false;
     for curline in cpsepbynl {
         let cds: Vec<&str> = curline.split_whitespace().collect();
         for cd in cds {
@@ -104,18 +102,33 @@ fn main() {
             } else if cd == "}" && fndclrbraces {
                 fndclrbraces = false;
                 fndclr = false;
-            } else if cd == ")" {
+            } else if cd == ")" && !echonl {
                 continue;
+            } else if cd == ")" && echonl {
+                echonl = false;
             } else if cd == "(" {
                 continue;
             } else if cd == " " {
                 continue;
+            } else if cd == "echonl" {
+                echonl = true;
+            } else if cd == "(" && fndclr && echonl {
+                continue;
+            } else if cd == ";" {
+                continue;
             } else {
-                println!(
-                    "err at line - '{}' - keyword - '{}' does not exists",
-                    indexl, cd
-                );
-                exit(-1);
+                if echonl && cd == ")" {
+                    echonl = false;
+                    continue;
+                } else if echonl {
+                    continue;
+                } else {
+                    println!(
+                        "err at line - '{}' - keyword - '{}' does not exists",
+                        indexl, cd
+                    );
+                    exit(-1);
+                }
             }
             indexl += 1;
         }

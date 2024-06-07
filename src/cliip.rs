@@ -22,7 +22,7 @@ pub fn run() {
     );
     let kr = true;
     while kr {
-        print!("> ");
+        print!("\n> ");
         match stdout().flush() {
             Ok(_) => {
                 let mut cmd = String::new(); // Move this here to reset `cmd` each iteration
@@ -37,10 +37,10 @@ pub fn run() {
                         } else {
                             let ccd = checkcd(cmd);
                             if ccd.0 {
-                                println!("OK");
+                                continue;
                             } else {
                                 println!(
-                                    "{}{}{}",
+                                    "\n{}{}{}",
                                     "ERR - THE COMMAND : ".red(),
                                     cmd.to_string().red(),
                                     " : DOES NOT EXISTS PLEASE CHECK".red()
