@@ -1,8 +1,8 @@
 [package]
 name = "bimble"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2021"
-
+authors = ["Jay","Bilal"]
 [dependencies]
 clearscreen = "3.0.0"
 colored = "2.1.0"

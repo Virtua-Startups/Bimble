@@ -1,13 +1,14 @@
-use std::{io::{stdout, Write}, path::Path};
+use std::path::Path;
 
 #[allow(unused_assignments)]
-pub fn checkcd(cdddd: &str) -> (bool, &str) {
+pub fn checkcd(code: &str) -> (bool, &str) {
     let mut fndclr = false;
     let mut fndclrbraces = false;
     let mut echonl = false;
     let mut fns: Vec<String> = Vec::new();
-    let cdd = cdddd.split_whitespace();
+    let cdd = code.split_whitespace();
     let mut txtt = String::new();
+    let (mut fq, mut fb) = (false, false);
 
     for cd in cdd {
         let result = match cd {
@@ -32,29 +33,38 @@ pub fn checkcd(cdddd: &str) -> (bool, &str) {
             }
             ")" if echonl => {
                 echonl = false;
-                (true,"OK")
+                println!("{}", txtt.trim()); // Print the collected text when echonl ends
+                txtt.clear();
+                (true, "OK")
             }
             txt if echonl => {
-                let chars: Vec<char> = txt.chars().collect();
-                let (mut fb, mut fq) = (false, false);
-                txtt.clear();
-                for i in chars {
-                    if i == '(' && fb {
-                        txtt.push(i);
-                    } else if i == '(' && !fb {
+                let ii: Vec<char> = txt.chars().collect();
+                let lenn = ii.len();
+                let mut curlenn = 0;
+                for i in ii {
+                    if i == '(' && !fb {
                         fb = true;
+                        curlenn += 1;
                         continue;
-                    } else if i == '\"' && fq {
+                    } else if i == '(' && fb {
                         txtt.push(i);
-                    } else if i == '\"' && !fq {
+                        curlenn += 1;
+                    } else if i == '"' && !fq {
                         fq = true;
+                        curlenn += 1;
                         continue;
+                    } else if i == '"' && fq && curlenn == lenn - 1 {
+                        // Skip the last quotation mark
+                        break;
+                    } else if i == '"' && fq {
+                        fq = false;
+                        curlenn += 1;
                     } else {
                         txtt.push(i);
+                        curlenn += 1;
                     }
                 }
-                print!("{txtt}");
-                stdout().flush().unwrap();
+                txtt.push(' '); // Preserve spaces between words
                 (true, "OK")
             }
             _ if fndclr => {
@@ -88,33 +98,28 @@ pub fn check_folder(foldnm: &str) -> (bool, &Path) {
 pub fn construct_newcd(content: &str) -> String {
     let mut newcd = String::new();
     let mut prevchr: Option<char> = None;
+    let mut in_quotes = false;
 
     for c in content.chars() {
         match c {
-            ' ' => {
+            ' ' if !in_quotes => {
                 if prevchr != Some(' ') {
                     newcd.push(c);
                 }
             }
-            '\"' => {
-                newcd.push(' ');
+            '"' => {
+                in_quotes = !in_quotes;
                 newcd.push(c);
             }
-            '\'' => {
-                newcd.push(' ');
-                newcd.push(c);
-            }
-            '\\' => {
-                newcd.push(' ');
+            '\'' | '\\' | '(' | ')' | '{' | '}' | ';' => {
+                if !in_quotes {
+                    newcd.push(' ');
+                }
                 newcd.push(c);
             }
             '\n' => {
                 newcd.push(c);
                 prevchr = None; // Reset prevchr after a newline
-            }
-            '(' | ')' | '{' | '}' | ';' => {
-                newcd.push(' ');
-                newcd.push(c);
             }
             _ => {
                 newcd.push(c);

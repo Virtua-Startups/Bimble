@@ -117,6 +117,11 @@ fn main() {
             } else if cd == ";" {
                 continue;
             } else {
+                for ffns in fns.clone(){
+                    if cd == ffns{
+                        continue;
+                    }
+                }
                 if echonl && cd == ")" {
                     echonl = false;
                     continue;
@@ -163,4 +168,5 @@ fn main() {
         println!("ERR - 'main' function not found in 'main.bb'");
     }
     println!("Code checking passed!\nprocceding to build!");
+    let _datafile = projfol.1;
 }

@@ -20,51 +20,29 @@ pub fn run() {
             .bold()
             .bright_green()
     );
-    let kr = true;
-    while kr {
-        print!("\n> ");
-        match stdout().flush() {
-            Ok(_) => {
-                let mut cmd = String::new(); // Move this here to reset `cmd` each iteration
-                match stdin().read_line(&mut cmd) {
-                    Ok(_) => {
-                        let cmd = cmd.trim();
-                        let cmd = &construct_newcd(cmd);
-                        if cmd == "exit!" {
-                            exit(-1);
-                        } else if cmd == "clear!" {
-                            clear().unwrap();
-                        } else {
-                            let ccd = checkcd(cmd);
-                            if ccd.0 {
-                                continue;
-                            } else {
-                                println!(
-                                    "\n{}{}{}",
-                                    "ERR - THE COMMAND : ".red(),
-                                    cmd.to_string().red(),
-                                    " : DOES NOT EXISTS PLEASE CHECK".red()
-                                );
-                            }
-                        }
-                    }
-                    Err(err) => {
-                        println!(
-                            "{}{}",
-                            "Unable to read input\nERR - ".red(),
-                            err.to_string().bright_red()
-                        );
-                        exit(-1);
-                    }
+
+    loop {
+        print!("> ");
+        stdout().flush().unwrap();
+
+        let mut cmd = String::new();
+        stdin().read_line(&mut cmd).unwrap();
+        let cmd = cmd.trim();
+        let cmd = construct_newcd(cmd);
+
+        match cmd.as_str() {
+            "exit!" => exit(0),
+            "clear!" => clear().unwrap(),
+            _ => {
+                let ccd = checkcd(&cmd);
+                if !ccd.0 {
+                    println!(
+                        "\n{}{}{}",
+                        "ERR - THE COMMAND : ".red(),
+                        cmd.to_string().red(),
+                        " : DOES NOT EXIST. PLEASE CHECK".red()
+                    );
                 }
-            }
-            Err(err) => {
-                println!(
-                    "{}{}",
-                    "Unable to flush the terminal...please try again\nerr - ".red(),
-                    err.to_string().bright_red()
-                );
-                exit(-1);
             }
         }
     }
