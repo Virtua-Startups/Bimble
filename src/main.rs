@@ -3,7 +3,7 @@ use colored::*;
 use std::{env::args, fs::File, io::Read, path::Path, process::exit};
 
 fn main() {
-    let total_checking_times = 2;
+    let total_checking_times = 4;
     let mut cuchecks = 0;
     let f: Vec<String> = args().collect();
     if f.len() <= 1 {
@@ -37,6 +37,8 @@ fn main() {
     let mut undefined_calls: Vec<String> = Vec::new();
 
     while cuchecks < total_checking_times {
+        cuchecks += 1;
+        println!("Opening file: {}", mfff); // Debug statement
         let mffff = File::open(&mfff); // Re-open the file on each iteration
 
         match mffff {
@@ -44,18 +46,25 @@ fn main() {
                 let mut code = String::new();
                 match mf.read_to_string(&mut code) {
                     Ok(_) => {
+                        println!("Read code: \n{}", code); // Debug statement
                         let cdp = code.split('\n');
                         for cd in cdp {
                             if !cd.contains("echonl") {
                                 let codes = cd.split_whitespace();
                                 for token in codes {
+                                    dbg!(&token, &isfunc); // Debug statement
                                     if token == "ON" {
+                                        println!("Found 'ON' token"); // Debug statement
                                         isfunc = true;
                                     } else if isfunc {
                                         match token.find('(') {
                                             Some(index) => {
                                                 let re = &token[..index];
-                                                fns.push(re.to_string());
+                                                if !fns.contains(&re.to_string()) {
+                                                    println!("Adding function to list: {}", re); // Debug statement
+                                                    fns.push(re.to_string());
+                                                }
+                                                isfunc = false;
                                             }
                                             None => {
                                                 eprintln!(
@@ -65,22 +74,23 @@ fn main() {
                                                 exit(1);
                                             }
                                         }
-                                        isfunc = false;
                                     } else if token == "}" {
                                         continue;
                                     } else {
-                                        let mut found = false;
-                                        for i in &fns {
-                                            if let Some(index) = token.find('(') {
+                                        println!("Checking function call: {}", token); // Debug statement
+                                        match token.find('(') {
+                                            Some(index) => {
                                                 let re = &token[..index];
-                                                if re == i {
-                                                    found = true;
-                                                    break;
+                                                println!("{re}");
+                                                if !fns.contains(&re.to_string()) && re != "main" {
+                                                    if cuchecks == total_checking_times {
+                                                        undefined_calls.push(re.to_string());
+                                                    }
                                                 }
                                             }
-                                        }
-                                        if !found {
-                                            undefined_calls.push(token.to_string());
+                                            None => {
+                                                continue;
+                                            }
                                         }
                                     }
                                 }
@@ -102,7 +112,7 @@ fn main() {
                         exit(1);
                     }
                 }
-                cuchecks += 1;
+                println!("Completed check iteration: {}", cuchecks); // Debug statement
             }
             Err(err) => {
                 eprintln!(
@@ -114,6 +124,9 @@ fn main() {
             }
         }
     }
+
+    // Debugging output to show collected function names
+    println!("Collected function names: {:?}", fns);
 
     // After all checks, report any undefined function calls
     if !undefined_calls.is_empty() {

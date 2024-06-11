@@ -55,3 +55,10 @@ if [ -f "./bin/lin/bvm" ]; then
 else
     echo "Failed to copy Linux bvm to bimble project."
 fi
+cd ../bimble/bin
+cp ./win/* ./bimble_win/
+cp ./lin/* ./bimble_lin/
+rm -rf ./bimble_lin.zip
+rm -rf ./bimble_win.zip
+7z a -tzip -mx=9 bimble_lin.zip ./bimble_lin
+7z a -tzip -mx=9 bimble_win.zip ./bimble_win
