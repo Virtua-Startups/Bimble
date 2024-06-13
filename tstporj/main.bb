@@ -1,6 +1,5 @@
-ON say(){
-    echonl("hello worlds!");
-}
 ON main(){
-    say();
+    echonl("hello world");
+    echol("this is echol");
+    out.flush();
 }

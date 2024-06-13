@@ -49,7 +49,9 @@ fn main() {
                         println!("Read code: \n{}", code); // Debug statement
                         let cdp = code.split('\n');
                         for cd in cdp {
-                            if !cd.contains("echonl") {
+                            let cd = cd.trim();
+                            if !cd.starts_with("echonl") && !cd.starts_with("echol") {
+                                println!("BREAKING WITH SPACES AT: {}", cd);
                                 let codes = cd.split_whitespace();
                                 for token in codes {
                                     dbg!(&token, &isfunc); // Debug statement
@@ -76,8 +78,9 @@ fn main() {
                                         }
                                     } else if token == "}" {
                                         continue;
+                                    } else if token == "out.flush();" {
+                                        continue;
                                     } else {
-                                        println!("Checking function call: {}", token); // Debug statement
                                         match token.find('(') {
                                             Some(index) => {
                                                 let re = &token[..index];
@@ -95,6 +98,8 @@ fn main() {
                                     }
                                 }
                             } else {
+                                println!("NOT BREAKING WITH SPACES AT: {}", cd);
+
                                 let codes = cd.trim();
                                 if !codes.contains(";") {
                                     eprintln!("Error: Missing ';' at end of line: {}", cd);
@@ -125,6 +130,10 @@ fn main() {
         }
     }
 
+    if !fns.contains(&"main".to_string()) {
+        println!("MAIN FUNCTION NOT FOUND IN CODE!!");
+        exit(1);
+    }
     // Debugging output to show collected function names
     println!("Collected function names: {:?}", fns);
 
