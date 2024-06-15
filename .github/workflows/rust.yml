@@ -29,7 +29,7 @@ jobs:
       id: create_release
       uses: actions/create-release@v1
       env:
-        GITHUB_TOKEN: ${{ secrets.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 }}
+        GITHUB_TOKEN: ${{ secrets.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 }}
       with:
         tag_name: ${{ github.ref }}
         release_name: Release ${{ github.ref }}
@@ -39,9 +39,9 @@ jobs:
       id: upload-release-asset 
       uses: actions/upload-release-asset@v1
       env:
-        GITHUB_TOKEN: ${{ secrets.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 }}
+        GITHUB_TOKEN: ${{ secrets.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 }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ./my-artifact.zip
-        asset_name: my-artifact.zip
+        asset_path: ./bimble.zip
+        asset_name: bimble.zip
         asset_content_type: application/zip
