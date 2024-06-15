@@ -19,20 +19,13 @@ jobs:
 
     - name: Build for Linux
       run: cargo build --release --target x86_64-unknown-linux-gnu
-    - name: Build for macOS
-      run: cargo build --release --target x86_64-apple-darwin
-
+    
     - name: Rename Executables
       run: |
-        mv target/x86_64-pc-windows-gnu/release/your_executable.exe target/x86_64-pc-windows-gnu/release/bimble.exe
         mv target/x86_64-unknown-linux-gnu/release/your_executable target/x86_64-unknown-linux-gnu/release/bimble
-        mv target/x86_64-apple-darwin/release/your_executable target/x86_64-apple-darwin/release/bimble
-
     - name: Package for Release
       run: |
-        zip -r windows.zip target/x86_64-pc-windows-gnu/release/bimble.exe
         zip -r linux.zip target/x86_64-unknown-linux-gnu/release/bimble
-        zip -r macos.zip target/x86_64-apple-darwin/release/bimble
 
     - name: Create Release
       id: create_release
@@ -45,7 +38,7 @@ jobs:
         body: |
           Release notes for v1.0.1
 
-          removed everything kept compiled files only and made the compiled files separate 
+          removed everything kept compiled file only and made the compiled file separate
         draft: false
         prerelease: false
 
@@ -56,15 +49,5 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./linux.zip
-        asset_name: bimble
-        asset_content_type: application/zip
-
-    - name: Upload macOS Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./macos.zip
         asset_name: bimble
         asset_content_type: application/zip
