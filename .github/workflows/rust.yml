@@ -19,13 +19,14 @@ jobs:
 
     - name: Build for Linux
       run: cargo build --release --target x86_64-unknown-linux-gnu
-    
-    - name: Rename Executables
+
+    - name: Rename Executable
       run: |
-        mv target/x86_64-unknown-linux-gnu/release/your_executable target/x86_64-unknown-linux-gnu/release/bimble
+        mv target/x86_64-unknown-linux-gnu/release/bimble target/x86_64-unknown-linux-gnu/release/bimble
+
     - name: Package for Release
       run: |
-        zip -r linux.zip target/x86_64-unknown-linux-gnu/release/bimble
+        zip -r bimble.zip target/x86_64-unknown-linux-gnu/release/bimble
 
     - name: Create Release
       id: create_release
@@ -33,21 +34,22 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: v1.0.0
-        release_name: Release v1.0.1
+        tag_name: v1.0.2
+        release_name: Release v1.0.2
         body: |
-          Release notes for v1.0.1
+          Release notes for v1.0.2
 
-          removed everything kept compiled file only and made the compiled file separate
+          Removed windows, mac, source code, targets folders and integrations and kept bimble the command
         draft: false
         prerelease: false
 
-    - name: Upload Linux Release Asset
+    - name: Upload Release Asset
+      id: upload-release-asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./linux.zip
-        asset_name: bimble
+        asset_path: ./bimble.zip
+        asset_name: bimble.zip
         asset_content_type: application/zip
