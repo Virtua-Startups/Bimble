@@ -51,16 +51,6 @@ jobs:
         draft: false
         prerelease: false
 
-    - name: Upload Windows Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./windows.zip
-        asset_name: bimble.exe
-        asset_content_type: application/zip
-
     - name: Upload Linux Release Asset
       uses: actions/upload-release-asset@v1
       env:
