@@ -20,10 +20,6 @@ jobs:
     - name: Build for Linux
       run: cargo build --release --target x86_64-unknown-linux-gnu
 
-    - name: Rename Executable
-      run: |
-        mv target/x86_64-unknown-linux-gnu/release/bimble target/x86_64-unknown-linux-gnu/release/bimble
-
     - name: Package for Release
       run: |
         zip -r bimble.zip target/x86_64-unknown-linux-gnu/release/bimble
