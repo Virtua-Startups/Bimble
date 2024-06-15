@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v4.1.7
     - name: Build
       run: cargo build --verbose
     - name: Run tests
@@ -30,10 +30,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        draft: false
-        prerelease: false
+        tag: ${{ steps.semantic-release.outputs.version }}
     - name: Upload Release Asset
       id: upload-release-asset
       uses: sekwah41/upload-release-assets@v1.1.0
